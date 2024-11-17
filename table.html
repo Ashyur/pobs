@@ -38,16 +38,18 @@
                     const aValue = a.getElementsByTagName('td')[columnIndex].innerText.toLowerCase();
                     const bValue = b.getElementsByTagName('td')[columnIndex].innerText.toLowerCase();
 
+                    // Compare values based on the current sort order
                     return isAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
                 });
 
+                // Append sorted rows back to the table
                 rows.forEach(row => table.appendChild(row));
-                table.dataset.sortOrder = isAscending ? "desc" : "asc";
+                table.dataset.sortOrder = isAscending ? "desc" : "asc";  // Toggle sort order
                 const headers = table.getElementsByTagName('th');
                 for (let i = 0; i < headers.length; i++) {
                     headers[i].classList.remove('sort-asc', 'sort-desc');
                 }
-                headers[columnIndex].classList.add(isAscending ? 'sort-desc' : 'sort-asc');
+                headers[columnIndex].classList.add(isAscending ? 'sort-desc' : 'sort-asc');  // Update header class
             }
 
             function filterTable() {
