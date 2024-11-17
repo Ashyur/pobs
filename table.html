@@ -43,10 +43,17 @@
 
                 // Sort rows based on the specified order
                 rows.sort((a, b) => {
-                    const aValue = a.getElementsByTagName('td')[columnIndex].innerText.toLowerCase();
-                    const bValue = b.getElementsByTagName('td')[columnIndex].innerText.toLowerCase();
+                    const aValue = a.getElementsByTagName('td')[columnIndex].innerText || '';
+                    const bValue = b.getElementsByTagName('td')[columnIndex].innerText || '';
+                    
+                    const aNum = parseFloat(aValue);
+                    const bNum = parseFloat(bValue);
 
-                    return currentSortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                    // Check if values are numbers; fallback to string comparison
+                    const isNumeric = !isNaN(aNum) && !isNaN(bNum);
+                    return currentSortOrder === 'asc' 
+                        ? isNumeric ? aNum - bNum : aValue.localeCompare(bValue)
+                        : isNumeric ? bNum - aNum : bValue.localeCompare(aValue);
                 });
 
                 // Append sorted rows back to the table
@@ -64,7 +71,7 @@
                     if (index === currentSortColumn) {
                         const newIndicator = document.createElement('span');
                         newIndicator.className = 'sort-indicator';
-                        newIndicator.textContent = currentSortOrder === 'asc' ? 'U' : 'D'; // Set indicator to "U" or "D"
+                        newIndicator.textContent = currentSortOrder === 'asc' ? '↑' : '↓'; // Set indicator to "↑" or "↓"
                         header.appendChild(newIndicator);
                     }
                 });
