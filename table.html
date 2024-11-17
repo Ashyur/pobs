@@ -1,0 +1,91 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>POB Table Export</title>
+        <style>
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+                cursor: pointer;
+            }
+            th.sort-asc::after {
+                content: " ▲";
+            }
+            th.sort-desc::after {
+                content: " ▼";
+            }
+            input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        </style>
+        <script>
+            function sortTable(columnIndex, tableId) {
+                const table = document.getElementById(tableId);
+                const rows = Array.from(table.getElementsByTagName('tr')).slice(1);
+                const isAscending = table.dataset.sortOrder === "asc";
+
+                rows.sort((a, b) => {
+                    const aValue = a.getElementsByTagName('td')[columnIndex].innerText.toLowerCase();
+                    const bValue = b.getElementsByTagName('td')[columnIndex].innerText.toLowerCase();
+
+                    return isAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+                });
+
+                rows.forEach(row => table.appendChild(row));
+                table.dataset.sortOrder = isAscending ? "desc" : "asc";
+                const headers = table.getElementsByTagName('th');
+                for (let i = 0; i < headers.length; i++) {
+                    headers[i].classList.remove('sort-asc', 'sort-desc');
+                }
+                headers[columnIndex].classList.add(isAscending ? 'sort-desc' : 'sort-asc');
+            }
+
+            function filterTable() {
+                const inputs = document.querySelectorAll('input[type="text"]');
+                const table = document.getElementById('pobTable');
+                const rows = table.getElementsByTagName('tr');
+
+                for (let i = 1; i < rows.length; i++) {
+                    let row = rows[i];
+                    let display = true;
+
+                    for (let j = 0; j < inputs.length; j++) {
+                        const input = inputs[j];
+                        const filter = input.value.toLowerCase();
+                        const cell = row.getElementsByTagName('td')[j];
+
+                        if (cell) {
+                            const cellValue = cell.textContent || cell.innerText;
+                            if (cellValue.toLowerCase().indexOf(filter) === -1) {
+                                display = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    row.style.display = display ? '' : 'none';
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <h1>POB Table</h1>
+        <table id="pobTable" data-sort-order="asc">
+            <thead>
+                <tr>
+    <th><input type="text" onkeyup="filterTable()" placeholder="Filter user_id"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter pob_name"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter iff"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter location"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter buy_sell"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter item"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter amount"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter price"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter posted_on"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter order_id"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter completedamount"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter totalamount"></th><th><input type="text" onkeyup="filterTable()" placeholder="Filter escrow"></th></tr><tr><th onclick="sortTable(0, 'pobTable')">user_id</th><th onclick="sortTable(1, 'pobTable')">pob_name</th><th onclick="sortTable(2, 'pobTable')">iff</th><th onclick="sortTable(3, 'pobTable')">location</th><th onclick="sortTable(4, 'pobTable')">buy_sell</th><th onclick="sortTable(5, 'pobTable')">item</th><th onclick="sortTable(6, 'pobTable')">amount</th><th onclick="sortTable(7, 'pobTable')">price</th><th onclick="sortTable(8, 'pobTable')">posted_on</th><th onclick="sortTable(9, 'pobTable')">order_id</th><th onclick="sortTable(10, 'pobTable')">completedamount</th><th onclick="sortTable(11, 'pobTable')">totalamount</th><th onclick="sortTable(12, 'pobTable')">escrow</th></tr></thead><tbody><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Basic Alloy</td><td>5000</td><td>5</td><td>2024-02-04 15:09:19.882899</td><td>2180</td><td>0</td><td>-809167</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Industrial Materials</td><td>5000</td><td>26</td><td>2024-02-04 15:10:47.597457</td><td>9777</td><td>0</td><td>0</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Oxygen</td><td>5000</td><td>20</td><td>2024-02-04 15:12:17.186342</td><td>9845</td><td>0</td><td>-289776</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Food Rations</td><td>5000</td><td>20</td><td>2024-02-04 15:13:15.783159</td><td>6707</td><td>0</td><td>-289776</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Water</td><td>5000</td><td>5</td><td>2024-02-04 15:14:06.827245</td><td>5223</td><td>0</td><td>-294479</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Hull Panels</td><td>1</td><td>25</td><td>2024-02-04 15:14:56.492321</td><td>6280</td><td>0</td><td>-965549</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Fertilizers</td><td>5000</td><td>30</td><td>2024-02-04 15:15:34.668077</td><td>7661</td><td>0</td><td>0</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Super Alloy</td><td>1</td><td>25</td><td>2024-02-04 15:16:22.443544</td><td>7194</td><td>0</td><td>0</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Scrap Metal</td><td>5000</td><td>5</td><td>2024-02-04 15:17:17.684866</td><td>6301</td><td>0</td><td>4</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>buy</td><td>Crew</td><td>1</td><td>1</td><td>2024-02-04 15:58:03.074501</td><td>6614</td><td>0</td><td>900</td><td>0</td></tr><tr><td>109719999509225472</td><td>Cape Horn Foundry</td><td>Freelancer</td><td>Magellan</td><td>sell</td><td>Prototype Components</td><td>0</td><td>1000</td><td>2024-02-06 14:32:44.698082</td><td>1937</td><td>0</td><td>0</td><td>0</td></tr><tr><td>2349979</td><td>POB Name</td><td></td><td></td><td>Buying</td><td>Water</td><td>20000</td><td>2000</td><td>2024-11-12 00:00:00</td><td>7943</td><td>0</td><td>0</td><td>0</td></tr><tr><td>2349994</td><td>POB Name</td><td></td><td></td><td>Buying</td><td>Water</td><td>20000</td><td>2000</td><td>2024-11-13 00:00:00</td><td>1799</td><td>0</td><td>0</td><td>0</td></tr><tr><td>2349994</td><td>POB Name</td><td></td><td></td><td>Buying</td><td>Water</td><td>20000</td><td>20000</td><td>2024-11-13 00:00:00</td><td>5840</td><td>0</td><td>0</td><td>0</td></tr><tr><td>2349994</td><td>POB Name</td><td></td><td></td><td>Selling</td><td>Oxygen</td><td>30000</td><td>2500</td><td>2024-11-13 00:00:00</td><td>4173</td><td>0</td><td>0</td><td>0</td></tr><tr><td>2349994</td><td>POB Name</td><td></td><td></td><td>Selling</td><td>Oxygen</td><td>30000</td><td>25000</td><td>2024-11-13 00:00:00</td><td>1910</td><td>0</td><td>0</td><td>0</td></tr><tr><td>2350353</td><td>POB Name</td><td></td><td></td><td>Buying</td><td>Gold</td><td>20000</td><td>250</td><td>2024-11-15 00:00:00</td><td>2763</td><td>0</td><td>0</td><td>0</td></tr><tr><td>2350354</td><td>POB Name</td><td></td><td></td><td>Buying</td><td>Platinum</td><td>20000</td><td>250</td><td>2024-11-15 00:00:00</td><td>3462</td><td>0</td><td>0</td><td>0</td></tr>
+            </tbody>
+        </table>
+    </body>
+    </html>
+    
