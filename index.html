@@ -73,7 +73,7 @@
                     const table = document.getElementById('pobTable');
                     const tbody = table.querySelector('tbody');
                     const rows = Array.from(tbody.getElementsByTagName('tr'));
-                    const headers = table.querySelectorAll('th');
+                    const headers = table.querySelectorAll('tr:nth-child(2) th'); // Select headers from second row
 
                     // Update sort direction
                     if (sortState.column === columnIndex) {
@@ -107,13 +107,11 @@
 
                 function filterTable() {
                     const table = document.getElementById('pobTable');
-                    const rows = table.getElementsByTagName('tr');
+                    const rows = Array.from(table.getElementsByTagName('tr')).slice(2); // Skip both header rows
                     const filters = Array.from(document.querySelectorAll('input[type="text"]'))
                         .map(input => input.value.toLowerCase());
 
-                    // Start from 1 to skip header row
-                    for (let i = 1; i < rows.length; i++) {
-                        const row = rows[i];
+                    rows.forEach(row => {
                         const cells = row.getElementsByTagName('td');
                         let shouldShow = true;
 
@@ -128,11 +126,11 @@
                         }
 
                         row.style.display = shouldShow ? '' : 'none';
-                    }
+                    });
                 }
 
-                // Add click handlers to all sortable headers
-                const headers = document.querySelectorAll('#pobTable th:not(:first-child)');
+                // Add click handlers to all sortable headers in the second row
+                const headers = document.querySelectorAll('#pobTable tr:nth-child(2) th');
                 headers.forEach((header, index) => {
                     header.addEventListener('click', () => sortTable(index));
                 });
