@@ -125,6 +125,16 @@
                 font-style: italic;
                 padding: 20px;
             }
+            
+            .debug-info {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                padding: 10px;
+                margin-bottom: 20px;
+                border-radius: 4px;
+                font-size: 14px;
+                color: #6c757d;
+            }
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -261,9 +271,13 @@
                 <div class="tab-header">
                     <h2>Active Insurance Policies</h2>
                 </div>
+                <div class="debug-info">
+                    Active Insurance Records Found: 0
+                </div>
     
                 <div class="no-data">
                     <p>No active insurance policies found.</p>
+                    <p>Records are considered active if they have systems_remaining > 0 AND no expiration_date.</p>
                 </div>
         
             </div>
@@ -271,6 +285,9 @@
             <div id="insurance-tab" class="tab-content">
                 <div class="tab-header">
                     <h2>Forum Purchases</h2>
+                </div>
+                <div class="debug-info">
+                    Total Insurance Records: 2
                 </div>
                 <table id="insurance-table">
                     <thead>
@@ -283,6 +300,9 @@
             <div id="orders-tab" class="tab-content">
                 <div class="tab-header">
                     <h2>Orders</h2>
+                </div>
+                <div class="debug-info">
+                    Filtered Orders Records: 0 (API orders excluded)
                 </div>
                 <table id="orders-table">
                     <thead>
