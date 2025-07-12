@@ -1,0 +1,390 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Insurance & Orders Management</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background-color: #f8f9fa;
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background-color: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            h1 {
+                color: #333;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            
+            .tab-container {
+                margin-bottom: 20px;
+            }
+            
+            .tab-buttons {
+                display: flex;
+                border-bottom: 2px solid #ddd;
+                margin-bottom: 20px;
+            }
+            
+            .tab-button {
+                padding: 12px 24px;
+                border: none;
+                background-color: #f8f9fa;
+                cursor: pointer;
+                font-size: 16px;
+                border-top: 2px solid transparent;
+                border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+                transition: all 0.3s ease;
+            }
+            
+            .tab-button:first-child {
+                border-left: 2px solid #ddd;
+            }
+            
+            .tab-button:last-child {
+                border-right: 2px solid #ddd;
+            }
+            
+            .tab-button.active {
+                background-color: #007bff;
+                color: white;
+                border-top-color: #007bff;
+            }
+            
+            .tab-button:hover:not(.active) {
+                background-color: #e9ecef;
+            }
+            
+            .tab-content {
+                display: none;
+            }
+            
+            .tab-content.active {
+                display: block;
+            }
+            
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-top: 20px;
+                background-color: white;
+            }
+            
+            th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+            
+            th {
+                background-color: #f2f2f2;
+                cursor: pointer;
+                user-select: none;
+                position: relative;
+                font-weight: bold;
+            }
+            
+            th:hover {
+                background-color: #e6e6e6;
+            }
+            
+            .sort-indicator {
+                display: inline-block;
+                margin-left: 5px;
+                width: 0;
+                height: 0;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+            }
+            
+            .sort-asc .sort-indicator {
+                border-bottom: 5px solid #333;
+                border-top: none;
+            }
+            
+            .sort-desc .sort-indicator {
+                border-top: 5px solid #333;
+                border-bottom: none;
+            }
+            
+            input {
+                width: 100%;
+                padding: 6px;
+                box-sizing: border-box;
+                margin-bottom: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+            
+            .tab-header {
+                margin-bottom: 15px;
+            }
+            
+            .tab-header h2 {
+                margin: 0;
+                color: #333;
+            }
+            
+            .active-insurance-tab .tab-header h2 {
+                color: #28a745;
+            }
+            
+            .forum-purchases-tab .tab-header h2 {
+                color: #17a2b8;
+            }
+            
+            .orders-tab .tab-header h2 {
+                color: #ffc107;
+            }
+            
+            .no-data {
+                text-align: center;
+                color: #666;
+                font-style: italic;
+                padding: 40px;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                margin: 20px 0;
+            }
+            
+            .stats-info {
+                background-color: #e7f3ff;
+                border: 1px solid #b3d9ff;
+                padding: 10px;
+                margin-bottom: 20px;
+                border-radius: 4px;
+                font-size: 14px;
+                color: #0056b3;
+            }
+            
+            .stats-info strong {
+                color: #003d82;
+            }
+            
+            tr:nth-child(even) {
+                background-color: #f8f9fa;
+            }
+            
+            tr:hover {
+                background-color: #fff3cd;
+            }
+        </style>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const tabButtons = document.querySelectorAll('.tab-button');
+                const tabContents = document.querySelectorAll('.tab-content');
+                
+                function showTab(tabName) {
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    tabButtons.forEach(button => {
+                        button.classList.remove('active');
+                    });
+                    
+                    document.getElementById(tabName).classList.add('active');
+                    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                }
+                
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tabName = button.getAttribute('data-tab');
+                        showTab(tabName);
+                    });
+                });
+                
+                showTab('active-insurance-tab');
+                
+                let sortStates = {
+                    'active-insurance-table': { column: null, direction: 'asc' },
+                    'all-insurance-table': { column: null, direction: 'asc' },
+                    'forum-purchases-table': { column: null, direction: 'asc' },
+                    'orders-table': { column: null, direction: 'asc' }
+                };
+
+                function compareValues(a, b, isAsc) {
+                    // Handle null/empty values
+                    if (a === '' || a === null || a === undefined) a = '';
+                    if (b === '' || b === null || b === undefined) b = '';
+                    
+                    const aNum = parseFloat(a);
+                    const bNum = parseFloat(b);
+                    
+                    if (!isNaN(aNum) && !isNaN(bNum)) {
+                        return isAsc ? aNum - bNum : bNum - aNum;
+                    }
+                    
+                    // Handle dates
+                    const aDate = new Date(a);
+                    const bDate = new Date(b);
+                    if (!isNaN(aDate.getTime()) && !isNaN(bDate.getTime())) {
+                        return isAsc ? aDate - bDate : bDate - aDate;
+                    }
+                    
+                    const aStr = String(a).toLowerCase();
+                    const bStr = String(b).toLowerCase();
+                    return isAsc ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+                }
+
+                function sortTable(tableId, columnIndex) {
+                    const table = document.getElementById(tableId);
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.getElementsByTagName('tr'));
+                    const headers = table.querySelectorAll('tr:nth-child(2) th');
+                    
+                    let sortState = sortStates[tableId];
+
+                    if (sortState.column === columnIndex) {
+                        sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        sortState.column = columnIndex;
+                        sortState.direction = 'asc';
+                    }
+
+                    headers.forEach(header => {
+                        header.classList.remove('sort-asc', 'sort-desc');
+                    });
+
+                    const currentHeader = headers[columnIndex];
+                    currentHeader.classList.add(
+                        sortState.direction === 'asc' ? 'sort-asc' : 'sort-desc'
+                    );
+
+                    rows.sort((rowA, rowB) => {
+                        const cellA = rowA.cells[columnIndex].textContent.trim();
+                        const cellB = rowB.cells[columnIndex].textContent.trim();
+                        return compareValues(cellA, cellB, sortState.direction === 'asc');
+                    });
+
+                    rows.forEach(row => tbody.appendChild(row));
+                }
+
+                function filterTable(tableId) {
+                    const table = document.getElementById(tableId);
+                    const rows = Array.from(table.getElementsByTagName('tr')).slice(2);
+                    const filters = Array.from(table.querySelectorAll('input[type="text"]'))
+                        .map(input => input.value.toLowerCase());
+
+                    rows.forEach(row => {
+                        const cells = row.getElementsByTagName('td');
+                        let shouldShow = true;
+
+                        for (let j = 0; j < filters.length; j++) {
+                            if (filters[j]) {
+                                const cellText = cells[j].textContent.toLowerCase();
+                                if (!cellText.includes(filters[j])) {
+                                    shouldShow = false;
+                                    break;
+                                }
+                            }
+                        }
+
+                        row.style.display = shouldShow ? '' : 'none';
+                    });
+                }
+
+                ['active-insurance-table', 'all-insurance-table', 'forum-purchases-table', 'orders-table'].forEach(tableId => {
+                    const table = document.getElementById(tableId);
+                    if (table) {
+                        const headers = table.querySelectorAll('tr:nth-child(2) th');
+                        headers.forEach((header, index) => {
+                            header.addEventListener('click', () => sortTable(tableId, index));
+                        });
+
+                        const filters = table.querySelectorAll('input[type="text"]');
+                        filters.forEach(filter => {
+                            filter.addEventListener('input', () => filterTable(tableId));
+                        });
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Insurance & Orders Management System</h1>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" data-tab="active-insurance-tab">Active Insurance</button>
+                    <button class="tab-button" data-tab="all-insurance-tab">All Insurance</button>
+                    <button class="tab-button" data-tab="forum-purchases-tab">Forum Purchases</button>
+                    <button class="tab-button" data-tab="orders-tab">Orders</button>
+                </div>
+                
+                <!-- Active Insurance Tab -->
+                <div id="active-insurance-tab" class="tab-content active active-insurance-tab">
+                    <div class="tab-header">
+                        <h2>Active Insurance Policies</h2>
+                    </div>
+                    <div class="stats-info">
+                        <strong>Active Insurance Records:</strong> 2
+                    </div>
+    
+                    <table id="active-insurance-table">
+                        <thead>
+                            <tr>
+        <th><input type="text" placeholder="Filter shipname"></th><th><input type="text" placeholder="Filter systems_available"></th><th><input type="text" placeholder="Filter systems_remaining"></th><th><input type="text" placeholder="Filter purchase_date"></th><th><input type="text" placeholder="Filter expiration_date"></th><th><input type="text" placeholder="Filter initial_system"></th><th><input type="text" placeholder="Filter final_system"></th></tr><tr><th>shipname<span class="sort-indicator"></span></th><th>systems_available<span class="sort-indicator"></span></th><th>systems_remaining<span class="sort-indicator"></span></th><th>purchase_date<span class="sort-indicator"></span></th><th>expiration_date<span class="sort-indicator"></span></th><th>initial_system<span class="sort-indicator"></span></th><th>final_system<span class="sort-indicator"></span></th></tr></thead><tbody><tr><td>Rue</td><td>1</td><td>1</td><td>2025-06-09 20:10:36.434784</td><td></td><td>New York</td><td></td></tr><tr><td>ICE|Debt.Collector</td><td>10</td><td>10</td><td>2025-07-12 16:39:11.164544</td><td></td><td>New London</td><td></td></tr></tbody></table>
+                </div>
+                
+                <!-- All Insurance Tab -->
+                <div id="all-insurance-tab" class="tab-content">
+                    <div class="tab-header">
+                        <h2>All Insurance Records</h2>
+                    </div>
+                    <div class="stats-info">
+                        <strong>Total Insurance Records:</strong> 7
+                    </div>
+                    <table id="all-insurance-table">
+                        <thead>
+                            <tr>
+    <th><input type="text" placeholder="Filter shipname"></th><th><input type="text" placeholder="Filter systems_available"></th><th><input type="text" placeholder="Filter systems_remaining"></th><th><input type="text" placeholder="Filter purchase_date"></th><th><input type="text" placeholder="Filter expiration_date"></th><th><input type="text" placeholder="Filter initial_system"></th><th><input type="text" placeholder="Filter final_system"></th></tr><tr><th>shipname<span class="sort-indicator"></span></th><th>systems_available<span class="sort-indicator"></span></th><th>systems_remaining<span class="sort-indicator"></span></th><th>purchase_date<span class="sort-indicator"></span></th><th>expiration_date<span class="sort-indicator"></span></th><th>initial_system<span class="sort-indicator"></span></th><th>final_system<span class="sort-indicator"></span></th></tr></thead><tbody><tr><td>ICE|Debt.Collector</td><td>10</td><td>10</td><td>2025-07-12 16:39:11.164544</td><td></td><td>New London</td><td></td></tr><tr><td>[SpaceTech]anna</td><td>10</td><td>0</td><td>2025-07-10 21:07:18.123902</td><td>2025-07-11 04:39:46</td><td>Galileo</td><td>Galileo</td></tr><tr><td>Crazy.V</td><td>1</td><td>0</td><td>2025-06-09 20:21:42.321587</td><td>2025-06-09 17:25:20</td><td>Alaska</td><td>Earhart</td></tr><tr><td>TheSaint</td><td>1</td><td>0</td><td>2025-06-09 20:19:22.574109</td><td>2025-06-09 17:25:15</td><td>California</td><td>Magellan</td></tr><tr><td>Kemsan.Delta</td><td>1</td><td>0</td><td>2025-06-09 20:16:11.652188</td><td>2025-06-14 12:12:44</td><td>Galileo</td><td>Connecticut</td></tr><tr><td>Rue</td><td>1</td><td>1</td><td>2025-06-09 20:10:36.434784</td><td></td><td>New York</td><td></td></tr><tr><td>Blackmist</td><td>3</td><td>0</td><td>2025-06-09 19:06:57.527738</td><td>2025-06-09 16:15:53</td><td>Texas</td><td>Magellan</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Forum Purchases Tab -->
+                <div id="forum-purchases-tab" class="tab-content forum-purchases-tab">
+                    <div class="tab-header">
+                        <h2>Forum Purchases</h2>
+                    </div>
+                    <div class="stats-info">
+                        <strong>Forum Purchase Records:</strong> 2
+                    </div>
+    
+                    <table id="forum-purchases-table">
+                        <thead>
+                            <tr>
+        <th><input type="text" placeholder="Filter id"></th><th><input type="text" placeholder="Filter shipname"></th><th><input type="text" placeholder="Filter value_insured"></th><th><input type="text" placeholder="Filter system_insured"></th><th><input type="text" placeholder="Filter money_paid"></th><th><input type="text" placeholder="Filter proof_of_payment"></th><th><input type="text" placeholder="Filter post_id"></th></tr><tr><th>id<span class="sort-indicator"></span></th><th>shipname<span class="sort-indicator"></span></th><th>value_insured<span class="sort-indicator"></span></th><th>system_insured<span class="sort-indicator"></span></th><th>money_paid<span class="sort-indicator"></span></th><th>proof_of_payment<span class="sort-indicator"></span></th><th>post_id<span class="sort-indicator"></span></th></tr></thead><tbody><tr><td>4</td><td>ICE|Debt.Collector</td><td>400000</td><td>10</td><td>100000</td><td>link placeholder</td><td>2371182</td></tr><tr><td>3</td><td>ICE|Debt.Collector</td><td>400000</td><td>10</td><td>100000</td><td>link placeholder</td><td>2350354</td></tr></tbody></table>
+                </div>
+                
+                <!-- Orders Tab -->
+                <div id="orders-tab" class="tab-content orders-tab">
+                    <div class="tab-header">
+                        <h2>Orders</h2>
+                    </div>
+                    <div class="stats-info">
+                        <strong>Order Records:</strong> 0 (API orders excluded)
+                    </div>
+    
+                    <div class="no-data">
+                        <p>No order records found or orders table doesn't exist.</p>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    
