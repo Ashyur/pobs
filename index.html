@@ -214,7 +214,6 @@
                 };
 
                 function compareValues(a, b, isAsc) {
-                    // Handle null/empty values
                     if (a === '' || a === null || a === undefined) a = '';
                     if (b === '' || b === null || b === undefined) b = '';
                     
@@ -225,7 +224,6 @@
                         return isAsc ? aNum - bNum : bNum - aNum;
                     }
                     
-                    // Handle dates
                     const aDate = new Date(a);
                     const bDate = new Date(b);
                     if (!isNaN(aDate.getTime()) && !isNaN(bDate.getTime())) {
