@@ -9,7 +9,6 @@
                 margin: 20px;
             }
             
-            /* Tab styling */
             .tab-container {
                 margin-bottom: 20px;
             }
@@ -58,7 +57,6 @@
                 display: block;
             }
             
-            /* Table styling */
             table {
                 border-collapse: collapse;
                 width: 100%;
@@ -130,29 +128,23 @@
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // Tab functionality
                 const tabButtons = document.querySelectorAll('.tab-button');
                 const tabContents = document.querySelectorAll('.tab-content');
                 
                 function showTab(tabName) {
-                    // Hide all tab contents
                     tabContents.forEach(content => {
                         content.classList.remove('active');
                     });
                     
-                    // Remove active class from all buttons
                     tabButtons.forEach(button => {
                         button.classList.remove('active');
                     });
                     
-                    // Show selected tab content
                     document.getElementById(tabName).classList.add('active');
                     
-                    // Add active class to clicked button
                     document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
                 }
                 
-                // Add click handlers to tab buttons
                 tabButtons.forEach(button => {
                     button.addEventListener('click', () => {
                         const tabName = button.getAttribute('data-tab');
@@ -160,10 +152,8 @@
                     });
                 });
                 
-                // Show active insurance tab by default
                 showTab('active-insurance-tab');
                 
-                // Initialize sorting state for all tables
                 let sortStates = {
                     'active-insurance-table': { column: null, direction: 'asc' },
                     'insurance-table': { column: null, direction: 'asc' },
@@ -171,7 +161,6 @@
                 };
 
                 function compareValues(a, b, isAsc) {
-                    // Check if values are numbers
                     const aNum = parseFloat(a);
                     const bNum = parseFloat(b);
                     
@@ -179,7 +168,6 @@
                         return isAsc ? aNum - bNum : bNum - aNum;
                     }
                     
-                    // Fall back to string comparison
                     const aStr = String(a).toLowerCase();
                     const bStr = String(b).toLowerCase();
                     return isAsc ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
@@ -193,7 +181,6 @@
                     
                     let sortState = sortStates[tableId];
 
-                    // Update sort direction
                     if (sortState.column === columnIndex) {
                         sortState.direction = sortState.direction === 'asc' ? 'desc' : 'asc';
                     } else {
@@ -201,25 +188,21 @@
                         sortState.direction = 'asc';
                     }
 
-                    // Remove all sort classes
                     headers.forEach(header => {
                         header.classList.remove('sort-asc', 'sort-desc');
                     });
 
-                    // Add sort class to current header
                     const currentHeader = headers[columnIndex];
                     currentHeader.classList.add(
                         sortState.direction === 'asc' ? 'sort-asc' : 'sort-desc'
                     );
 
-                    // Sort rows
                     rows.sort((rowA, rowB) => {
                         const cellA = rowA.cells[columnIndex].textContent.trim();
                         const cellB = rowB.cells[columnIndex].textContent.trim();
                         return compareValues(cellA, cellB, sortState.direction === 'asc');
                     });
 
-                    // Reattach sorted rows
                     rows.forEach(row => tbody.appendChild(row));
                 }
 
@@ -247,17 +230,14 @@
                     });
                 }
 
-                // Add event listeners for all tables
                 ['active-insurance-table', 'insurance-table', 'orders-table'].forEach(tableId => {
                     const table = document.getElementById(tableId);
                     if (table) {
-                        // Add click handlers to headers
                         const headers = table.querySelectorAll('tr:nth-child(2) th');
                         headers.forEach((header, index) => {
                             header.addEventListener('click', () => sortTable(tableId, index));
                         });
 
-                        // Add filter handlers
                         const filters = table.querySelectorAll('input[type="text"]');
                         filters.forEach(filter => {
                             filter.addEventListener('input', () => filterTable(tableId));
